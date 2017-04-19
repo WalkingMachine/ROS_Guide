@@ -1,1 +1,20 @@
 \chapter{Installing ROS}
+The system requirements for ROS Kinect are available on the ROS wiki. For this tutorial, we will be focusing on installing ros on ubuntu 16.04LTS.
+
+\section{Installing Ubuntu}
+To install Ubuntu you will need to get a ISO from the \href{www.ubuntu.com}{ubuntu website}. The next step is to follow the setup step from ubuntu.
+
+\section {Installing ROS}
+The installation step is explain on the \href{wiki.ros.org/kinetic/Installation/Ubuntu}{ROS wiki}. There is also a script inside the sara\_install directory that automated the whole step 
+
+\paragraph{Installing S.A.R.A.}
+
+\subparagraph{Automatic Install}
+
+\begin{lstlisting}[language=bash,caption={Install S.A.R.A. Packages}]
+git clone https://github.com/WalkingMachine/sara_install.git
+cd sara_install
+./install_sara_packages.bash
+\end{lstlisting}
+
+\subparagraph{Manual Install}
