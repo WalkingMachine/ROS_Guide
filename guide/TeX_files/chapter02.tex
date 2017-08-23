@@ -1,20 +1,87 @@
 \chapter{Installing ROS}
-The system requirements for ROS Kinect are available on the ROS wiki. For this tutorial, we will be focusing on installing ros on ubuntu 16.04LTS.
+The system requirements for ROS Kinect are available on the ROS wiki. For this tutorial, we will be focusing on installing ROS on ubuntu 16.04LTS.
+
+\newpage
 
 \section{Installing Ubuntu}
 To install Ubuntu you will need to get a ISO from the \href{www.ubuntu.com}{ubuntu website}. The next step is to follow the setup step from ubuntu.
 
+\newpage
+
 \section {Installing ROS}
-The installation step is explain on the \href{wiki.ros.org/kinetic/Installation/Ubuntu}{ROS wiki}. There is also a script inside the sara\_install directory that automated the whole step 
+The installation step is explain on the \href{wiki.ros.org/kinetic/Installation/Ubuntu}{ROS wiki}.
 
-\paragraph{Installing S.A.R.A.}
+\subsection{Manual Install (Recommended Method)}
+The recommended method is to install ros by hand the first time. This will help you learn the configuration needed for ROS. The process to install ROS is always the same.
 
-\subparagraph{Automatic Install}
+\begin{enumerate}
+	\item Add ROS repo
+	\item Add ROS build key to the keyring
+	\item update the source list
+	\item install ros-desktop-full packages
+	\item Add ROS entry in the .bashrc
+	\item Initialize rosdep
+\end{enumerate}
 
-\begin{lstlisting}[language=bash,caption={Install S.A.R.A. Packages}]
-git clone https://github.com/WalkingMachine/sara_install.git
-cd sara_install
-./install_sara_packages.bash
+\subsubsection{Add ROS repo}
+\noindent See the following command :
+\begin{lstlisting}[breaklines=True language=bash]
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+\end{lstlisting}
+\noindent This command will add the repo for ROS inside the sources list of ubuntu.
+
+\subsubsection{Add ROS build key}
+\noindent See the following command:
+\begin{lstlisting}[breaklines=True language=bash]
+$ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 \end{lstlisting}
 
-\subparagraph{Manual Install}
+\noindent This command will add will add the build server key to your keychain.
+
+\subsubsection{Update and Install ROS}
+\noindent See the following command:
+\begin{lstlisting}[breaklines=true language=bash]
+$ sudo apt-get update && sudo apt-get install ros-kinetic-desktop-full
+\end{lstlisting}
+\noindent This command will update the source list and install ros-kinetic-desktop-full
+
+\subsubsection{Add ROS entry to .bashrc}
+\noindent See the following command:
+\begin{lstlisting}[breaklines=True language=bash]
+$ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && source ~/.bashrc
+\end{lstlisting}
+\noindent This command will add the environment variable for ROS
+
+\subsubsection{Initialize rosdep}
+\noindent See the following command:
+\begin{lstlisting}[breaklines=True language=bash]
+$ sudo rosdep init
+$ rosdep update
+\end{lstlisting}
+\noindent This command will update rosdep with the latest information (DO NOT sudo rosdep update this will break your computer)
+
+\subsubsection{Add build dependencies}
+\noindent See the following command:
+\begin{lstlisting}[breaklines=True language=bash]
+$ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+\end{lstlisting}
+\noindent This command will install the build-essential for building ROS packages
+
+\newpage
+
+\section{Configure ROS}
+
+In this section we are going to see how to configure a ROS workspace to put your work inside.
+
+\begin{lstlisting}[breaklines=True language=bash]
+$ mkdir -p ~/catkin_ws/src
+$ cd ~/catkin_ws/src
+$ catkin_init_workspace
+$ cd ..
+$ catkin_make
+\end{lstlisting}
+These command will create a new directory, initialize a workspace and make the whole workspace. This will also be the workspace for you to practice with ROS.
+\newpage
+
+\section{Conclusion}
+In this chapter, we saw how to install Ubuntu and also the step to install and configure ROS on your computer.
