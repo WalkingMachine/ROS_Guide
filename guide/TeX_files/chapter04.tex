@@ -1,0 +1,587 @@
+\chapter{Coding in ROS}
+
+\section{Introduction to msg and srv}
+
+\begin{itemize}
+	\item  msg: msg files are simple text files that describe the fields of a ROS message. They are used to generate source code for messages in different languages.
+	
+	\item srv: an srv file describes a service. It is composed of two parts: a request and a response.
+\end{itemize}
+
+msg files are stored in the msg directory of a package, and srv files are stored in the srv directory.
+
+msgs are just simple text files with a field type and field name per line. The field types you can use are:
+
+\begin{itemize}
+	\item int8, int16, int32, int64 (plus uint*)
+	\item float32, float64
+	\item string
+	\item time, duration
+	\item other msg files
+	\item variable-length array[] and fixed-length array[C]
+\end{itemize}
+
+There is also a special type in ROS: Header, the header contains a timestamp and coordinate frame information that are commonly used in ROS. You will frequently see the first line in a msg file have Header header.
+
+Here is an example of a msg that uses a Header, a string primitive, and two other msgs :
+\begin{lstlisting}[breaklines=true languages=bash]
+Header header
+string child_frame_id
+geometry_msgs/PoseWithCovariance pose
+geometry_msgs/TwistWithCovariance twist
+\end{lstlisting}
+
+srv files are just like msg files, except they contain two parts: a request and a response. The two parts are separated by a '---' line. Here is an example of a srv file:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+int64 A
+int64 B
+---
+int64 Sum
+\end{lstlisting}
+
+In the above example, A and B are the request, and Sum is the response.
+
+\subsection{Using msg}
+
+\subsubsection{Creating a msg}
+Let's define a new msg in the package that was created in the previous tutorial.
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscd beginner_tutorials
+$ mkdir msg
+$ echo "int64 num" > msg/Num.msg
+\end{lstlisting}
+
+The example .msg file above contains only 1 line. You can, of course, create a more complex file by adding multiple elements, one per line, like this:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+string first_name
+string last_name
+uint8 age
+uint32 score
+\end{lstlisting}
+
+There's one more step, though. We need to make sure that the msg files are turned into source code for C++, Python, and other languages:
+
+Open package.xml, and make sure these two lines are in it and uncommented:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+<build_depend>message_generation</build_depend>
+<run_depend>message_runtime</run_depend>
+\end{lstlisting}
+
+Note that at build time, we need "message\_generation", while at runtime, we only need "message\_runtime".
+
+Open CMakeLists.txt
+
+Add the message\_generation dependency to the find\_package call which already exists in your CMakeLists.txt so that you can generate messages. You can do this by simply adding message\_generation to the list of COMPONENTS such that it looks like this:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+# Do not just add this to your CMakeLists.txt, modify the existing text to add message_generation before the closing parenthesis
+find_package(catkin REQUIRED COMPONENTS
+roscpp
+rospy
+std_msgs
+message_generation
+)
+\end{lstlisting}
+
+You may notice that sometimes your project builds fine even if you did not call find\_package with all dependencies. This is because catkin combines all your projects into one, so if an earlier project calls find\_package, yours is configured with the same values. But forgetting the call means your project can easily break when built in isolation.
+
+Also make sure you export the message runtime dependency.
+
+\begin{lstlisting}[breaklines=true languages=bash]
+catkin_package(
+...
+CATKIN_DEPENDS message_runtime ...
+...)
+\end{lstlisting}
+
+Find the following block of code:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
+\end{lstlisting}
+
+Uncomment it by removing the \# symbols and then replace the stand in Message*.msg files with your .msg file, such that it looks like this:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+add_message_files(
+FILES
+Num.msg
+)
+\end{lstlisting}
+
+By adding the .msg files manually, we make sure that CMake knows when it has to reconfigure the project after you add other .msg files.
+
+Now we must ensure the generate\_messages() function is called.
+
+You need to uncomment these lines:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
+\end{lstlisting}
+
+so it looks like:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+generate_messages(
+DEPENDENCIES
+std_msgs
+)
+\end{lstlisting}
+
+\subsubsection{Using rosmsg}
+That's all you need to do to create a msg. Let's make sure that ROS can see it using the rosmsg show command.
+
+Usage:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rosmsg show [message type]
+\end{lstlisting}
+
+Example:
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rosmsg show beginner_tutorials/Num
+\end{lstlisting}
+
+You will see:
+\begin{lstlisting}[breaklines=true languages=bash]
+int64 num
+\end{lstlisting}
+
+\subsection{Using srv}
+\subsubsection{Creating a srv}
+
+Let's use the package we just created to create a srv:
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscd beginner_tutorials
+$ mkdir srv
+\end{lstlisting}
+
+Instead of creating a new srv definition by hand, we will copy an existing one from another package.
+
+For that, roscp is a useful commandline tool for copying files from one package to another.
+
+Usage:
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscp [package_name] [file_to_copy_path] [copy_path]
+\end{lstlisting}
+
+Now we can copy a service from the rospy\_tutorials package:
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscp rospy_tutorials AddTwoInts.srv srv/AddTwoInts.srv
+\end{lstlisting}
+
+Also you need the same changes to package.xml for services as for messages, so look above for the additional dependencies required.
+
+Remove \# to uncomment the following lines:
+\begin{lstlisting}[breaklines=true languages=bash]
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
+\end{lstlisting}
+
+And replace the placeholder Service*.srv files for your service files:
+\begin{lstlisting}[breaklines=true languages=bash]
+add_service_files(
+FILES
+AddTwoInts.srv
+)
+\end{lstlisting}
+
+\subsubsection{Using rossrv}
+That's all you need to do to create a srv. Let's make sure that ROS can see it using the rossrv show command.
+
+Usage:
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rossrv show <service type>
+\end{lstlisting}
+
+Example:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rossrv show beginner_tutorials/AddTwoInts
+\end{lstlisting}
+
+You will see:
+\begin{lstlisting}[breaklines=true languages=bash]
+int64 a
+int64 b
+---
+int64 sum
+\end{lstlisting}
+
+\subsection{Building the package}
+
+To make all the ros message and service:
+\begin{lstlisting}[breaklines=true languages=bash]
+# In your catkin workspace
+$ roscd beginner_tutorials
+$ cd ../..
+$ catkin_make install
+$ cd -
+\end{lstlisting}
+
+\section{Writing a Simple Publisher and Subscriber (Python)}
+
+\subsection{Writing the Publisher Node}
+"Node" is the ROS term for an executable that is connected to the ROS network. Here we'll create the publisher ("talker") node which will continually broadcast a message.
+
+Change directory into the beginner\_tutorials package, you created in the earlier tutorial:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscd beginner_tutorials
+\end{lstlisting}
+
+\subsubsection{The code}
+First lets create a 'scripts' folder to store our Python scripts in:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ mkdir scripts
+$ cd scripts
+\end{lstlisting}
+
+Create a new python script called talker.py and put this inside:
+
+\begin{lstlisting}[breaklines=true languages=python]
+#!/usr/bin/env python
+import rospy
+from std_msgs.msg import String
+
+def talker():
+	pub = rospy.Publisher('chatter', String, queue_size=10)
+	rospy.init_node('talker', anonymous=True)
+	rate = rospy.Rate(10) # 10hz
+	while not rospy.is_shutdown():
+	hello_str = "hello world %s" % rospy.get_time()
+	rospy.loginfo(hello_str)
+	pub.publish(hello_str)
+	rate.sleep()
+
+if __name__ == '__main__':
+	try:
+		talker()
+	except rospy.ROSInterruptException:
+		pass
+\end{lstlisting}
+
+\subsubsection{The Code Explained}
+Now, let's break the code down.
+
+\begin{lstlisting}[breaklines=true languages=python]
+#!/usr/bin/env python
+\end{lstlisting}
+
+Every Python ROS Node will have this declaration at the top. The first line makes sure your script is executed as a Python script.
+
+\begin{lstlisting}[breaklines=true languages=python]
+import rospy
+from std_msgs.msg import String
+\end{lstlisting}
+
+You need to import rospy if you are writing a ROS Node. The std\_msgs.msg import is so that we can reuse the std\_msgs/String message type (a simple string container) for publishing.
+
+\begin{lstlisting}[breaklines=true languages=python]
+pub = rospy.Publisher('chatter', String, queue_size=10)
+rospy.init_node('talker', anonymous=True)
+\end{lstlisting}
+
+This section of code defines the talker's interface to the rest of ROS. pub = rospy.Publisher("chatter", String, queue\_size=10) declares that your node is publishing to the chatter topic using the message type String. String here is actually the class std\_msgs.msg.String. The queue\_size argument limits the amount of queued messages if any subscriber is not receiving the them fast enough.
+
+The next line, rospy.init\_node(NAME, ...), is very important as it tells rospy the name of your node -- until rospy has this information, it cannot start communicating with the ROS Master. In this case, your node will take on the name talker. NOTE: the name must be a base name, i.e. it cannot contain any slashes "/".
+
+anonymous = True ensures that your node has a unique name by adding random numbers to the end of NAME.
+
+\begin{lstlisting}[breaklines=true languages=python]
+rate = rospy.Rate(10) # 10hz
+\end{lstlisting}
+
+This line creates a Rate object rate. With the help of its method sleep(), it offers a convenient way for looping at the desired rate. With its argument of 10, we should expect to go through the loop 10 times per second (as long as our processing time does not exceed 1/10th of a second!)
+
+\begin{lstlisting}[breaklines=true languages=python]
+    while not rospy.is_shutdown():
+		hello_str = "hello world %s" % rospy.get_time()
+		rospy.loginfo(hello_str)
+		pub.publish(hello_str)
+		rate.sleep()
+\end{lstlisting}
+
+This loop is a fairly standard rospy construct: checking the rospy.is\_shutdown() flag and then doing work. You have to check is\_shutdown() to check if your program should exit (e.g. if there is a Ctrl-C or otherwise). In this case, the "work" is a call to pub.publish(hello\_str) that publishes a string to our chatter topic. The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
+
+This loop also calls rospy.loginfo(str), which performs triple-duty: the messages get printed to screen, it gets written to the Node's log file, and it gets written to rosout.
+
+std\_msgs.msg.String is a very simple message type, so you may be wondering what it looks like to publish more complicated types. The general rule of thumb is that constructor args are in the same order as in the .msg file. You can also pass in no arguments and initialize the fields directly, e.g.
+
+\begin{lstlisting}[breaklines=true languages=python]
+msg = String()
+msg.data = str
+\end{lstlisting}
+
+or you can initialize some of the fields and leave the rest with default values:
+
+\begin{lstlisting}[breaklines=true languages=python]
+String(data=str)
+\end{lstlisting}
+
+You may be wondering about the last little bit:
+
+\begin{lstlisting}[breaklines=true languages=python]
+try:
+	talker()
+except rospy.ROSInterruptException:
+	pass
+\end{lstlisting}
+
+In addition to the standard Python \_\_main\_\_ check, this catches a rospy.ROSInterruptException exception, which can be thrown by rospy.sleep() and rospy.Rate.sleep() methods when Ctrl-C is pressed or your Node is otherwise shutdown. The reason this exception is raised is so that you don't accidentally continue executing code after the sleep().
+
+Now we need to write a node to receive the messages.
+
+\subsection{Wrting the Subscriber Node}
+
+\subsubsection{The code}
+
+Create a new python script called listener.py and put this inside:
+
+\begin{lstlisting}[breaklines=true languages=python]
+#!/usr/bin/env python
+import rospy
+from std_msgs.msg import String
+
+def callback(data):
+	rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+
+def listener():
+
+	# In ROS, nodes are uniquely named. If two nodes with the same
+	# node are launched, the previous one is kicked off. The
+	# anonymous=True flag means that rospy will choose a unique
+	# name for our 'listener' node so that multiple listeners can
+	# run simultaneously.
+	rospy.init_node('listener', anonymous=True)
+	
+	rospy.Subscriber("chatter", String, callback)
+	
+	# spin() simply keeps python from exiting until this node is stopped
+	rospy.spin()
+
+if __name__ == '__main__':
+	listener()
+\end{lstlisting}
+
+This declares that your node subscribes to the chatter topic which is of type std\_msgs.msgs.String. When new messages are received, callback is invoked with the message as the first argument.
+
+We also changed up the call to rospy.init\_node() somewhat. We've added the anonymous=True keyword argument. ROS requires that each node have a unique name. If a node with the same name comes up, it bumps the previous one. This is so that malfunctioning nodes can easily be kicked off the network. The anonymous=True flag tells rospy to generate a unique name for the node so that you can have multiple listener.py nodes run easily.
+
+The final addition, rospy.spin() simply keeps your node from exiting until the node has been shutdown. Unlike roscpp, rospy.spin() does not affect the subscriber callback functions, as those have their own threads.
+
+Also never to forget to chmod +x the script this will tell linux that they are executable.
+
+\subsection{Building your nodes}
+
+We use CMake as our build system and, yes, you have to use it even for Python nodes. This is to make sure that the autogenerated Python code for messages and services is created.
+
+
+
+Go to your catkin workspace and run catkin\_make:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ cd ~/catkin_ws
+$ catkin_make
+\end{lstlisting}
+
+\subsection{Running the Nodes}
+\subsubsection{Running the Publisher}
+
+Make sure that a roscore is up and running
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscore
+\end{lstlisting}
+
+In the last tutorial, we made a publisher called "talker". Let's run it:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rosrun beginner_tutorials talker.py
+\end{lstlisting}
+
+You will see something similar to:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+[INFO] [WallTime: 1314931831.774057] hello world 1314931831.77
+[INFO] [WallTime: 1314931832.775497] hello world 1314931832.77
+[INFO] [WallTime: 1314931833.778937] hello world 1314931833.78
+[INFO] [WallTime: 1314931834.782059] hello world 1314931834.78
+[INFO] [WallTime: 1314931835.784853] hello world 1314931835.78
+[INFO] [WallTime: 1314931836.788106] hello world 1314931836.79
+\end{lstlisting}
+
+The publisher node is up and running. Now we need a subscriber to receive messages from the publisher.
+
+\subsubsection{Runnning the Subscriber}
+
+In the last tutorial, we made a subscriber called "listener". Let's run it:
+
+\begin{lstlisting}[breaklines=true language=bash]
+$ rosrun beginner_tutorials listener.py
+\end{lstlisting}
+
+You will see something similar to:
+
+\begin{lstlisting}[breaklines=true language=bash]
+[INFO] [WallTime: 1314931969.258941] /listener_17657_1314931968795I heard hello world 1314931969.26
+[INFO] [WallTime: 1314931970.262246] /listener_17657_1314931968795I heard hello world 1314931970.26
+[INFO] [WallTime: 1314931971.266348] /listener_17657_1314931968795I heard hello world 1314931971.26
+[INFO] [WallTime: 1314931972.270429] /listener_17657_1314931968795I heard hello world 1314931972.27
+[INFO] [WallTime: 1314931973.274382] /listener_17657_1314931968795I heard hello world 1314931973.27
+[INFO] [WallTime: 1314931974.277694] /listener_17657_1314931968795I heard hello world 1314931974.28
+[INFO] [WallTime: 1314931975.283708] /listener_17657_1314931968795I heard hello world 1314931975.28
+\end{lstlisting}
+
+\section{Writing a Simple Service and Client (Python)}
+Here we'll create the service ("add\_two\_ints\_server") node which will receive two ints and return the sum.
+
+
+
+Change directory into the beginner\_tutorials package, you created in the earlier tutorial, creating a package:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ roscd beginner_tutorials
+\end{lstlisting}
+
+\subsection{The Code}
+
+\subsubsection{Writing a Service Node}
+Create the scripts/add\_two\_ints\_server.py file within the beginner\_tutorials package and paste the following inside it:
+
+\begin{lstlisting}[breaklines=true language=python]
+#!/usr/bin/env python
+
+from beginner_tutorials.srv import *
+import rospy
+
+def handle_add_two_ints(req):
+	print "Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b))
+	return AddTwoIntsResponse(req.a + req.b)
+
+def add_two_ints_server():
+	rospy.init_node('add_two_ints_server')
+	s = rospy.Service('add_two_ints', AddTwoInts, handle_add_two_ints)
+	print "Ready to add two ints."
+	rospy.spin()
+
+if __name__ == "__main__":
+	add_two_ints_server()
+\end{lstlisting}
+
+Don't forget to make the node executable:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+chmod +x scripts/add_two_ints_server.py
+\end{lstlisting}
+
+\subsubsection{The Code Explained}
+Now, let's break the code down.
+
+There's very little to writing a service using rospy. We declare our node using init\_node() and then declare our service:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+ s = rospy.Service('add_two_ints', AddTwoInts, handle_add_two_ints)
+\end{lstlisting}
+
+This declares a new service named add\_two\_ints with the AddTwoInts service type. All requests are passed to handle\_add\_two\_ints function. handle\_add\_two\_ints is called with instances of AddTwoIntsRequest and returns instances of AddTwoIntsResponse.
+
+Just like with the subscriber example, rospy.spin() keeps your code from exiting until the service is shutdown.
+
+\subsubsection{Writing the Client Node}
+Create the scripts/add\_two\_ints\_client.py file within the beginner\_tutorials package and paste the following inside it:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+#!/usr/bin/env python
+
+import sys
+import rospy
+from beginner_tutorials.srv import *
+
+def add_two_ints_client(x, y):
+	rospy.wait_for_service('add_two_ints')
+	try:
+	add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts)
+	resp1 = add_two_ints(x, y)
+	return resp1.sum
+	except rospy.ServiceException, e:
+	print "Service call failed: %s"%e
+
+def usage():
+	return "%s [x y]"%sys.argv[0]
+
+if __name__ == "__main__":
+	if len(sys.argv) == 3:
+		x = int(sys.argv[1])
+		y = int(sys.argv[2])
+	else:
+		print usage()
+		sys.exit(1)
+	print "Requesting %s+%s"%(x, y)
+	print "%s + %s = %s"%(x, y, add_two_ints_client(x, y))
+\end{lstlisting}
+
+Don't forget to make the node executable:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+chmod +x scripts/add_two_ints_client.py
+\end{lstlisting}
+
+\subsubsection{The Code Explained}
+Now, let's break the code down.
+
+The client code for calling services is also simple. For clients you don't have to call init\_node().
+
+\subsection{Building your nodes}
+Go to your catkin workspace and run catkin\_make.
+
+\begin{lstlisting}[breaklines=true languages=bash]
+# In your catkin workspace
+$ cd ~/catkin_ws
+$ catkin_make
+\end{lstlisting}
+
+\section{Examining the Simple Service and Client}
+
+\subsection{Running the Service}
+Let's start by running the service:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rosrun beginner_tutorials add_two_ints_server.py
+\end{lstlisting}
+
+You should see something similar to:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+Ready to add two ints.
+\end{lstlisting}
+
+\subsection{Running the client}
+
+Now let's run the client with the necessary arguments:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+$ rosrun beginner_tutorials add_two_ints_client.py 1 3
+\end{lstlisting}
+
+You should see something similar to:
+
+\begin{lstlisting}[breaklines=true languages=bash]
+Requesting 1+3
+1 + 3 = 4
+\end{lstlisting}
+
+Now that you've successfully run your first server and client, let's learn how to record and play back data.
