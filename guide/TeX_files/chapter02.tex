@@ -1,18 +1,18 @@
 \chapter{Installing ROS}
-The system requirements for ROS Kinect are available on the ROS wiki. For this tutorial, we will be focusing on installing ROS on ubuntu 16.04LTS.
+The system requirements for ROS Kinetic are available on the ROS wiki. For this tutorial, we will be focusing on installing ROS on ubuntu 16.04LTS.
 
 \newpage
 
 \section{Installing Ubuntu}
-To install Ubuntu you will need to get a ISO from the \href{www.ubuntu.com}{ubuntu website}. The next step is to follow the setup step from ubuntu.
+To install Ubuntu you will need to get a ISO from the \href{www.ubuntu.com}{ubuntu website}. Next is to follow the setup step from ubuntu.
 
 \newpage
 
 \section {Installing ROS}
-The installation step is explain on the \href{wiki.ros.org/kinetic/Installation/Ubuntu}{ROS wiki}.
+The installation step are explain on the \href{wiki.ros.org/kinetic/Installation/Ubuntu}{ROS wiki}.
 
-\subsection{Manual Install (Recommended Method)}
-The recommended method is to install ros by hand the first time. This will help you learn the configuration needed for ROS. The process to install ROS is always the same.
+\subsection{Manual Installation (Recommended Method)}
+The recommended method is to install ROS by hand the first time. This will help you to learn the configuration needed for ROS. The process to install ROS is always the same.
 
 \begin{enumerate}
 	\item Add ROS repo
@@ -28,7 +28,7 @@ The recommended method is to install ros by hand the first time. This will help 
 \begin{lstlisting}[breaklines=True language=bash]
 $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 \end{lstlisting}
-\noindent This command will add the repo for ROS inside the sources list of ubuntu.
+\noindent This command will add the repo for ROS inside the source list of ubuntu.
 
 \subsubsection{Add ROS build key}
 \noindent See the following command:
@@ -36,21 +36,21 @@ $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) ma
 $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 \end{lstlisting}
 
-\noindent This command will add will add the build server key to your keychain.
+\noindent This command will add the build server key to your keychain.
 
 \subsubsection{Update and Install ROS}
 \noindent See the following command:
 \begin{lstlisting}[breaklines=true language=bash]
 $ sudo apt-get update && sudo apt-get install ros-kinetic-desktop-full
 \end{lstlisting}
-\noindent This command will update the source list and install ros-kinetic-desktop-full
+\noindent This command will update the source list and install ros-kinetic-desktop-full.
 
 \subsubsection{Add ROS entry to .bashrc}
 \noindent See the following command:
 \begin{lstlisting}[breaklines=True language=bash]
 $ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && source ~/.bashrc
 \end{lstlisting}
-\noindent This command will add the environment variable for ROS
+\noindent This command will add the environment variable for ROS.
 
 \subsubsection{Initialize rosdep}
 \noindent See the following command:
@@ -58,14 +58,14 @@ $ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && source ~/.bashrc
 $ sudo rosdep init
 $ rosdep update
 \end{lstlisting}
-\noindent This command will update rosdep with the latest information (DO NOT sudo rosdep update this will break your computer)
+\noindent This command will update rosdep with the latest information (DO NOT sudo rosdep update, this will break your computer)
 
 \subsubsection{Add build dependencies}
 \noindent See the following command:
 \begin{lstlisting}[breaklines=True language=bash]
 $ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
 \end{lstlisting}
-\noindent This command will install the build-essential for building ROS packages
+\noindent This command will install the build-essential to build ROS packages
 
 \newpage
 
@@ -84,4 +84,4 @@ These command will create a new directory, initialize a workspace and make the w
 \newpage
 
 \section{Conclusion}
-In this chapter, we saw how to install Ubuntu and also the step to install and configure ROS on your computer.
+In this chapter, we saw how to install Ubuntu and also the steps to install and configure ROS on your computer.

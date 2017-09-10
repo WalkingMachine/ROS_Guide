@@ -1,27 +1,27 @@
 \chapter{Get Started with ROS}
-In this chapter, we are going to explore what are nodes and topic inside of ROS.
+In this chapter, we are going to explore what are nodes and topics inside of ROS.
 
 \newpage
 \section{Introduction to ROS}
- The Robot Operating System or ROS use a distributed publisher and subscriber system to pass message between nodes. The nodes can also be on another computer or local. By using this architecture, we are able to scale on multiple computers over our network. This also helps use to debug the robot by hooking our laptop to the robot network. 
+ The Robot Operating System or ROS use a distributed publisher and subscriber system to pass messages between nodes. The nodes can also be on another computer or local. By using this architecture, we are able to scale on multiple computers over our network. This also helps use to debug the robot by hooking our laptop to the robot network. 
  
- Another important part of ROS is the tools. The tools like RQT, RVIZ and roswtf, help us debug whats going on with the robot in real-time. This is the avantage by using a pre-build ecosystem to build our robot with.
+ Another important part of ROS are the tools. The tools like RQT, RVIZ and roswtf, help us debug whats going on with the robot in real-time. This is the avantage of using a pre-build ecosystem to build our robot with.
 
 \newpage
 
 \section{Introduction to Nodes}
-The nodes are the building blocks of any ROS based system. For our robot S.A.R.A. we use around 200 nodes when we are running fully autonomously. 
+The nodes are the building blocks of any ROS based system. For our robot S.A.R.A. we use around 200 nodes when we are running it fully autonomously. 
 
 \newpage
 
 \section{Introduction to Packages}
-Each nodes must live inside of a directory that is call a packages. Each driver, state machine, and library. 
+Each nodes must live inside of a directory that is call a packages.
 
 \newpage
 
 \section{Navigating the ROS Filesystem}
 \subsection{Prerequisites}
-For this tutorial we will inspect a package in ros-tutorials, please install it using
+For this tutorial we will inspect a package in ros-tutorials, please install it using:
 
 \begin{lstlisting}[breaklines=True language=bash]
 $ sudo apt-get install ros-kinetic-ros-tutorials
@@ -31,12 +31,12 @@ $ sudo apt-get install ros-kinetic-ros-tutorials
 
 \begin{itemize}
 	\item Packages: Packages are the software organization unit of ROS code. Each package can contain libraries, executables, scripts, or other artifacts.
-	\item Manifest(Package.xml): A manifest is a description of a package. It serves to define dependencies between packages and to capture meta information about the package like version, maintainer, license, etc...
+	\item Manifest(Package.xml): A manifest is the description of a package. It's used to define dependencies between packages and to capture meta information about the package like version, maintainer, license, etc...
 \end{itemize}
 
 \subsubsection{rospack}
 
-rospack allows you to get information about packages. In this tutorial, we are only going to cover the find option, which returns the path to package. 
+rospack allows you to get information about packages.
 
 \begin{lstlisting}[breaklines=True language=bash]
 $ rospack [packages_name]
@@ -64,12 +64,12 @@ Example:
 roscd roscpp
 \end{lstlisting}
 
-After we check what the current directory is:
+Then we check what the current directory is:
 \begin{lstlisting}[breaklines=True language=bash]
 pwd
 \end{lstlisting}
 
-This command will return
+This command will return:
 \begin{lstlisting}[breaklines=True language=bash]
 	/opt/ros/kinetic/share/roscpp
 \end{lstlisting}
@@ -107,12 +107,12 @@ This naming pattern holds for many of the ROS tools.Now that you can get around 
 \section{Create a ros packages}
 In this section, we are going to learn how to create a package. For this tutorial, we are going to be using the catkin\textunderscore ws we created before.
 
-\subsection{Basic of anatomy of a ROS package}
+\subsection{Basic anatomy of a ROS package}
 For a package to be considered a catkin package it must meet a few requirements:
 \begin{itemize}
 	\item The package must contain a catkin compliant package.xml file.
 	\item The package must contain a CMakeLists.txt which uses catkin.
-	\item Each package must have its own folder
+	\item Each package must have its own folder.
 \end{itemize}
 
 \noindent The simplest possible package might have a structure which looks like this:
@@ -125,7 +125,7 @@ my_package/
 
 \subsection{Creating a catkin package}
 
-To create the package you must be inside you catkin\textunderscore ws
+To create the package you must be inside your catkin\textunderscore ws
 \begin{lstlisting}[breaklines=true languages=bash]
 $ cd ~/catkin_ws/src
 \end{lstlisting}
@@ -181,7 +181,7 @@ Next comes the maintainer tag:
  <maintainer email="user@todo.todo">user</maintainer>
 \end{lstlisting}
 
-\noindent This is a required and important tag for the package.xml because it lets others know who to contact about the package. At least one maintainer is required, but you can have many if you like. The name of the maintainer goes into the body of the tag, but there is also an email attribute that should be filled out:
+\noindent This is a required and important tag for the package.xml because it lets others know who to contact about the package. At least one maintainer is required, but you can have many if you'd like. The name of the maintainer goes into the body of the tag, but there is also an email attribute that should be filled out:
 
 \begin{lstlisting}[breaklines=true languages=xml]
 <maintainer email="you@yourdomain.tld">Your Name</maintainer>
@@ -331,7 +331,7 @@ Please run:
 $ roscore
 \end{lstlisting}
 
-You will see somethiong similar to:
+You will see something similar to:
 
 \begin{lstlisting}[breaklines=true languages=bash]
 ... logging to ~/.ros/log/9cf88ce4-b14d-11df-8a75-00251148e8cf/roslaunch-machine_name-13039.log
@@ -361,7 +361,7 @@ started core service [/rosout]
 \end{lstlisting}
 
 \subsection{Using rosnode}
-Open up a new terminal, and let's use rosnode to see what running roscore did... Bare in mind to keep the previous terminal open either by opening a new tab or simply minimizing it.
+Open up a new terminal, and let's use rosnode to see what running roscore did... dont't forget to keep the previous terminal open either by opening a new tab or simply minimizing it.
 
 rosnode displays information about the ROS nodes that are currently running. The rosnode list command lists these active nodes:
 
@@ -374,10 +374,10 @@ you will see:
 /rosout
 \end{lstlisting}
 
-This showed us that here is only one node runnning: rosout. This is always running as it collects and logs nodes debugging output.
+This showed us that there is only one node runnning: rosout. This is always running as it collects and logs nodes debugging output.
 
 \subsection{Using rosrun}
-rosrun allows you to use the package name to directly run a node within a package (without having to know the package path)
+rosrun allows you to use the package name to directly run a node within a package (without having to know the package path).
 
 Usage:
 \begin{lstlisting}[breaklines=true languages=bash]
@@ -414,7 +414,7 @@ We'll also need something to drive the turtle around with. Please run in a new t
 $ rosrun turtlesim turtlesim_node
 \end{lstlisting}
 
-Now you can use the arrow keys of the keyboard to drive the turtle around. If you can not drive the turtle select the terminal window of the turtle\_teleop\_key to make sure that the keys that you type are recorded.
+Now you can use the arrow keys of the keyboard to drive the turtle around. If you cannot drive the turtle select the terminal window of the turtle\_teleop\_key to make sure that the keys that you typed are recorded.
 
 \subsection{ROS Topics}
 The turtlesim\_node and the turtle\_teleop\_key node are communicating with each other over a ROS Topic. The turtle\_teleop\_key is publishing the key strokes on a topic, while turtlesim subscribes to the same topic to receive the key strokes. Let's use rqt\_graph which shows the nodes and topics currently running.
@@ -569,10 +569,8 @@ float64 y
 float64 z
 \end{lstlisting}
 
-\section{rostopic continued}
-Now that we have learned about ROS messages, let's use rostopic with messages.
 
-\subsection{Using rostopic pub}
+\section{Using rostopic pub}
 rostopic pub publishes data on to a topic currently advertised.
 
 Usage:
@@ -609,7 +607,7 @@ This is the message type to use when publishing to the topic:
 geometry_msgs/Twist
 \end{lstlisting}
 
-the option(double-dash) tells the option parser that none of the following arguments is an option. This is required in cases where your arguments have a leading dash -, like negative numbers.
+The option(double-dash) tells the option parser that none of the following arguments is an option. This is required in cases where your arguments have a leading dash -, like negative numbers.
 \begin{lstlisting}[breaklines=true languages=bash]
 --
 \end{lstlisting}
@@ -631,7 +629,7 @@ As you can see the turtle is running in a continuous circle. In a new terminal, 
 rostopic echo /turtle1/pose
 \end{lstlisting}
 
-\subsection{Using rostopic hz}
+\section{Using rostopic hz}
 
 rostopic hz reports the rate at which data is published
 
@@ -666,7 +664,7 @@ Now we can tell that the turtlesim is publishing data about our turtle at the ra
 $ rostopic type /turtle1/cmd_vel | rosmsg show
 \end{lstlisting}
 
-\subsection{Using rqt\_plot}
+\section{Using rqt\_plot}
 
 rqt\_plot displays a scrolling time plot of the data published on topics. Here we'll use rqt\_plot to plot the data being published on the /turtle1/pose topic. First, start rqt\_plot by typing:
 
@@ -680,7 +678,7 @@ Pressing the minus button shows a menu that allows you to hide the specified top
 \section{Understanding ROS Services and Parameters}
 
 \subsection{ROS Services}
-Services are another way that nodes can communicate with each other. Services allow nodes to send a request and receive a response.
+Services are another way that nodes can communicate with each other. Services allows nodes to send a request and receive a response.
 
 \subsection{Using rosservice}
 rosservice can easily attach to ROS's client/service framework with services. rosservice has many commands that can be used on topics, as show below:
@@ -718,7 +716,7 @@ The list command shows us that the turtlesim node provides nine services: reset,
 /turtlesim/set_logger_level
 \end{lstlisting}
 
-Let's look more closely at the clear service using rosservice type
+Let's look more closely at the clear service using rosservice type.
 
 \subsubsection{rosservice type}
 Usage:
@@ -851,7 +849,7 @@ rosparam dump [file_name] [namespace]
 rosparam load [file_name] [namespace]
 \end{lstlisting}
 
-Here we write all the parameters to the file params.yaml
+Here we write all the parameters to the file params.yaml:
 
 \begin{lstlisting}[breaklines=true languages=bash]
 $ rosparam dump params.yaml
@@ -964,6 +962,3 @@ Two turtlesims will start and in a new terminal send the rostopic command:
 $ rostopic pub /turtlesim1/turtle1/cmd_vel geometry_msgs/Twist -r 1 -- '[2.0, 0.0, 0.0]' '[0.0, 0.0, -1.8]'
 \end{lstlisting}
 You will see the two turtlesims start moving even though the publish command is only being sent to turtlesim1.
-
-\section{conclusion}
-
